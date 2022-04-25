@@ -15,4 +15,5 @@ DataFusionとBigTableの技術調査
 ②Cloud Storageにアップロードをトリガーに、CloudFusionでETLを行い、BigTableにインサート
 ③BigTableのテーブルをBigQueryに外部テーブル登録
 ④BigTableへのクエリで、アンケートデータにアクセス可能
+
 ![Datafusionシステム化方式 drawio](https://user-images.githubusercontent.com/26422417/165108808-7fb86050-2075-4a05-8721-00135dc46c02.png)
