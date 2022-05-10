@@ -1,0 +1,149 @@
+{
+    "name": "weekly_survey_etl",
+    "description": "Data Pipeline Application",
+    "artifact": {
+        "name": "cdap-data-pipeline",
+        "version": "6.6.0",
+        "scope": "SYSTEM"
+    },
+    "config": {
+        "resources": {
+            "memoryMB": 2048,
+            "virtualCores": 1
+        },
+        "driverResources": {
+            "memoryMB": 2048,
+            "virtualCores": 1
+        },
+        "connections": [
+            {
+                "from": "GCS",
+                "to": "JSONFormatter"
+            },
+            {
+                "from": "JSONFormatter",
+                "to": "BigQuery"
+            }
+        ],
+        "comments": [],
+        "postActions": [],
+        "properties": {},
+        "processTimingEnabled": true,
+        "stageLoggingEnabled": false,
+        "stages": [
+            {
+                "name": "GCS",
+                "plugin": {
+                    "name": "GCSFile",
+                    "type": "batchsource",
+                    "label": "GCS",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.19.0",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "useConnection": "false",
+                        "referenceName": "weekly_survey_csv",
+                        "path": "gs://test-asasaki-input/${my-file}",
+                        "format": "csv",
+                        "sampleSize": "1000",
+                        "delimiter": ",",
+                        "skipHeader": "true",
+                        "filenameOnly": "false",
+                        "recursive": "false",
+                        "encrypted": "false",
+                        "fileEncoding": "UTF-8",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"questionaire_id\",\"type\":\"string\"},{\"name\":\"respondent_id\",\"type\":\"int\"},{\"name\":\"timestamp\",\"type\":\"string\"},{\"name\":\"q1\",\"type\":\"string\"},{\"name\":\"q2\",\"type\":\"string\"},{\"name\":\"q3\",\"type\":\"string\"},{\"name\":\"q4\",\"type\":\"string\"},{\"name\":\"q5\",\"type\":\"string\"}]}",
+                        "project": "auto-detect",
+                        "serviceAccountType": "filePath",
+                        "serviceFilePath": "auto-detect"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"questionaire_id\",\"type\":\"string\"},{\"name\":\"respondent_id\",\"type\":\"int\"},{\"name\":\"timestamp\",\"type\":\"string\"},{\"name\":\"q1\",\"type\":\"string\"},{\"name\":\"q2\",\"type\":\"string\"},{\"name\":\"q3\",\"type\":\"string\"},{\"name\":\"q4\",\"type\":\"string\"},{\"name\":\"q5\",\"type\":\"string\"}]}"
+                    }
+                ],
+                "id": "GCS"
+            },
+            {
+                "name": "JSONFormatter",
+                "plugin": {
+                    "name": "JSONFormatter",
+                    "type": "transform",
+                    "label": "JSONFormatter",
+                    "artifact": {
+                        "name": "transform-plugins",
+                        "version": "2.8.0",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"answer\",\"type\":\"string\"}]}"
+                    }
+                },
+                "outputSchema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"answer\",\"type\":\"string\"}]}",
+                "inputSchema": [
+                    {
+                        "name": "GCS",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"questionaire_id\",\"type\":\"string\"},{\"name\":\"respondent_id\",\"type\":\"int\"},{\"name\":\"timestamp\",\"type\":\"string\"},{\"name\":\"q1\",\"type\":\"string\"},{\"name\":\"q2\",\"type\":\"string\"},{\"name\":\"q3\",\"type\":\"string\"},{\"name\":\"q4\",\"type\":\"string\"},{\"name\":\"q5\",\"type\":\"string\"}]}"
+                    }
+                ],
+                "id": "JSONFormatter",
+                "type": "transform",
+                "label": "JSONFormatter",
+                "icon": "icon-jsonformatter"
+            },
+            {
+                "name": "BigQuery",
+                "plugin": {
+                    "name": "BigQueryTable",
+                    "type": "batchsink",
+                    "label": "BigQuery",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.19.0",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "referenceName": "BigQuery",
+                        "project": "test-asasaki",
+                        "dataset": "asasaki_data_infra_dataset",
+                        "table": "survey",
+                        "serviceAccountType": "filePath",
+                        "operation": "insert",
+                        "truncateTable": "false",
+                        "allowSchemaRelaxation": "false",
+                        "location": "US",
+                        "createPartitionedTable": "false",
+                        "partitioningType": "TIME",
+                        "partitionFilterRequired": "false",
+                        "schema": "{\"name\":\"etlSchemaBody\",\"type\":\"record\",\"fields\":[{\"name\":\"answer\",\"type\":\"string\"}]}",
+                        "serviceFilePath": "auto-detect"
+                    }
+                },
+                "outputSchema": "{\"name\":\"etlSchemaBody\",\"type\":\"record\",\"fields\":[{\"name\":\"answer\",\"type\":\"string\"}]}",
+                "inputSchema": [
+                    {
+                        "name": "JSONFormatter",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"answer\",\"type\":\"string\"}]}"
+                    }
+                ],
+                "id": "BigQuery",
+                "type": "batchsink",
+                "label": "BigQuery",
+                "icon": "fa-plug"
+            }
+        ],
+        "schedule": "0 1 */1 * *",
+        "engine": "spark",
+        "numOfRecordsPreview": 100,
+        "rangeRecordsPreview": {
+            "min": 1,
+            "max": "5000"
+        },
+        "description": "Data Pipeline Application",
+        "maxConcurrentRuns": 1
+    }
+}

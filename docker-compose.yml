@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  terraform:
+    container_name: terraform
+    entrypoint: ash
+    image: hashicorp/terraform:latest
+    working_dir: /workspace
+    volumes:
+      - ./terraform/:/workspace/terraform/
+      - ./src/:/workspace/src/
+      - gcloud-config:/root/.config
+    tty: true
+    secrets:
+      - gcp_secret
+  gcloud:
+    container_name: gcloud
+    entrypoint: "gcloud"
+    image: google/cloud-sdk:alpine
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace:cached
+      - gcloud-config:/root/.config
+    tty: true
+volumes:
+  gcloud-config:
+secrets:
+  gcp_secret:
+    file:
+      ../secrets/gcp_secret_key_terraform.json
