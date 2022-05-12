@@ -5,52 +5,17 @@ resource "google_service_account" "develop" {
   display_name = "develop"
 }
 
-resource "google_project_iam_member" "develop_cloudfunction_invoker" {
+resource "google_project_iam_member" "cloud_function_service_account" {
   project = var.GCP_PROJECT_ID
-  role = "roles/cloudfunctions.invoker"
-  member = "serviceAccount:${google_service_account.develop.email}"
-}
-
-resource "google_project_iam_member" "develop_datafusion_admin" {
-  project = var.GCP_PROJECT_ID
-  role = "roles/datafusion.admin"
-  member = "serviceAccount:${google_service_account.develop.email}"
-}
-
-resource "google_project_iam_member" "develop_storage_admin" {
-  project = var.GCP_PROJECT_ID
-  role = "roles/storage.admin"
-  member = "serviceAccount:${google_service_account.develop.email}"
-}
-
-resource "google_project_iam_member" "develop_bigquery_editer" {
-  project = var.GCP_PROJECT_ID
-  role = "roles/bigquery.dataEditor"
-  member = "serviceAccount:${google_service_account.develop.email}"
-}
-
-resource "google_project_iam_member" "develop_bigquery_jobUser" {
-  project = var.GCP_PROJECT_ID
-  role = "roles/bigquery.jobUser"
-  member = "serviceAccount:${google_service_account.develop.email}"
-}
-
-resource "google_project_iam_member" "develop_serviceAccountUser" {
-  project = var.GCP_PROJECT_ID
-  role = "roles/iam.serviceAccountUser"
-  member = "serviceAccount:${google_service_account.develop.email}"
-}
-
-resource "google_project_iam_member" "develop_dataproc_worker" {
-  project = var.GCP_PROJECT_ID
-  role = "roles/dataproc.worker"
+  count = "${length(var.cloud_function_roles)}"
+  role   = "${element(var.cloud_function_roles, count.index)}"
   member = "serviceAccount:${google_service_account.develop.email}"
 }
 
 resource "google_project_iam_member" "sa-datafusion_serviceAccountUser" {
   project = var.GCP_PROJECT_ID
   role = "roles/iam.serviceAccountUser"
-  member = "serviceAccount:service-840090550767@gcp-sa-datafusion.iam.gserviceaccount.com"
+  member = "serviceAccount:service-${var.GCP_PROJECT_NO}@gcp-sa-datafusion.iam.gserviceaccount.com"
 }
 
 

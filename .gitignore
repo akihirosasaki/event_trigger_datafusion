@@ -354,3 +354,5 @@ MigrationBackup/
 /terraform/.terraform/*
 /terraform/.terraform.lock.hcl
 /terraform/terraform.*
+
+.env

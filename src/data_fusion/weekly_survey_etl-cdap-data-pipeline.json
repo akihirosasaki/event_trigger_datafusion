@@ -45,7 +45,7 @@
                     "properties": {
                         "useConnection": "false",
                         "referenceName": "weekly_survey_csv",
-                        "path": "gs://test-asasaki-input/${my-file}",
+                        "path": "gs://${var.GCP_PROJECT_ID}-input/${my-file}",
                         "format": "csv",
                         "sampleSize": "1000",
                         "delimiter": ",",
@@ -108,7 +108,7 @@
                     },
                     "properties": {
                         "referenceName": "BigQuery",
-                        "project": "test-asasaki",
+                        "project": "${var.GCP_PROJECT_ID}",
                         "dataset": "asasaki_data_infra_dataset",
                         "table": "survey",
                         "serviceAccountType": "filePath",
